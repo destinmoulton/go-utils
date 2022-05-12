@@ -19,7 +19,8 @@ type Process struct {
 	sid     int
 }
 
-type Processes []*Process
+type Procs struct {
+}
 
 func (p *Process) Pid() int {
 	return p.pid
@@ -31,13 +32,15 @@ func (p *Process) Cmdline() string {
 	return p.cmdline
 }
 
-func Find(needle string) (*Process, error) {
-	processes, err := GetAllProcesses()
+var Processes Procs
+
+func (p *Procs) Find(needle string) (*Process, error) {
+	processes, err := p.getAllProcesses()
 	if err != nil {
 		return nil, err
 	}
 
-	for _, proc := range *processes {
+	for _, proc := range processes {
 		if strings.Contains(proc.binary, needle) {
 			return proc, nil
 		}
@@ -48,7 +51,7 @@ func Find(needle string) (*Process, error) {
 	return nil, nil
 }
 
-func GetAllProcesses() (*Processes, error) {
+func (p *Procs) getAllProcesses() ([]*Process, error) {
 
 	pf, err := os.Open("/proc")
 
@@ -57,7 +60,7 @@ func GetAllProcesses() (*Processes, error) {
 	}
 	defer pf.Close()
 
-	processes := Processes{}
+	var processes []*Process
 	for {
 		folders, err := pf.Readdirnames(20)
 		if err == io.EOF {
@@ -86,7 +89,7 @@ func GetAllProcesses() (*Processes, error) {
 			processes = append(processes, proc)
 		}
 	}
-	return &processes, nil
+	return processes, nil
 }
 
 // collate builds the Process data from fs /proc files
