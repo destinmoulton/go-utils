@@ -34,6 +34,7 @@ func (p *Process) Cmdline() string {
 
 var Processes Procs
 
+// Find a process by string in either the binary (preferred) or cmdline
 func (p *Procs) Find(needle string) (*Process, error) {
 	processes, err := p.getAllProcesses()
 	if err != nil {
@@ -49,6 +50,18 @@ func (p *Procs) Find(needle string) (*Process, error) {
 		}
 	}
 	return nil, nil
+}
+
+// Determine if a process is running
+func (p *Procs) IsRunning(name string) (bool, error) {
+	proc, err := p.Find(name)
+	if err != nil {
+		return false, err
+	}
+	if proc == nil {
+		return false, nil
+	}
+	return true, nil
 }
 
 func (p *Procs) getAllProcesses() ([]*Process, error) {
