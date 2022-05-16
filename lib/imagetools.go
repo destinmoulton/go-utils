@@ -3,7 +3,7 @@ package lib
 import (
 	"image"
 	"image/png"
-	"os"
+	"io/ioutil"
 
 	"github.com/kbinani/screenshot"
 	"gocv.io/x/gocv"
@@ -49,13 +49,19 @@ func (i *ImageUtils) SystrayShot(height int) (*image.RGBA, error) {
 }
 
 // Save an image as a png
-func (i *ImageUtils) SavePNG(img *image.RGBA, path string) error {
-	file, err := os.Create(path)
+func (i *ImageUtils) SaveAsTempPNG(img *image.RGBA) (string, error) {
+	file, err := ioutil.TempFile("", "utiligo-")
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer file.Close()
-	return png.Encode(file, img)
+	err = png.Encode(file, img)
+
+	if err != nil {
+		return "", err
+	}
+
+	return file.Name(), nil
 }
 
 // Take a screenshot using ScreenshotBounds
