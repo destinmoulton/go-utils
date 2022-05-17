@@ -1,10 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"go-utils/lib"
 	"os"
 	"os/exec"
+	"path/filepath"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -17,8 +17,7 @@ func main() {
 	isRunning, err := lib.Processes.IsRunning(p)
 
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		log.Fatalf("error scanning processes: %v", err)
 	}
 
 	if !isRunning {
@@ -32,13 +31,13 @@ func main() {
 	// Get the system tray and save as png
 	img, err := lib.ImageTools.SystrayShot(120)
 	if err != nil {
-		log.Panicf("unable to make systray snapshot: %v", err)
+		log.Fatalf("unable to make systray snapshot: %v", err)
 	}
 	filename, err := lib.ImageTools.SaveAsTempPNG(img)
 	if err != nil {
-		log.Panicf("unable to save temp png: %v\n", err)
+		log.Fatalf("unable to save temp png: %v\n", err)
 	}
-	small := "dropbox_icon.png"
+	small := filepath.Join(lib.UserDirs.Config(), "dropbox_icon.png")
 	isIconInSystray := lib.ImageTools.IsImageWithin(small, filename)
 	os.Remove(filename)
 	//fmt.Printf("Is %s within %s? %v\n", small, filename, isIconInSystray)

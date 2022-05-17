@@ -48,7 +48,7 @@ func (d *DirData) makeUserDirs() {
 	for k, dir := range d.dirs {
 		err := os.MkdirAll(dir, 0777)
 		if err != nil {
-			log.Panic("error creating userdir %s %s %v", k, dir, err)
+			log.Fatal("error creating userdir %s %s %v", k, dir, err)
 		}
 	}
 }

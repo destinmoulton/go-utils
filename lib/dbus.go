@@ -1,6 +1,9 @@
 package lib
 
-import "github.com/godbus/dbus/v5"
+import (
+	"github.com/godbus/dbus/v5"
+	log "github.com/sirupsen/logrus"
+)
 
 type DBusUtils struct{}
 
@@ -9,7 +12,7 @@ var DBus DBusUtils
 func (b *DBusUtils) Msg(title string, contents string) {
 	conn, err := dbus.ConnectSessionBus()
 	if err != nil {
-		panic(err)
+		log.Errorf("cannot connect to dbus: %v", err)
 	}
 	defer conn.Close()
 
@@ -18,6 +21,6 @@ func (b *DBusUtils) Msg(title string, contents string) {
 		"", title, contents, []string{},
 		map[string]dbus.Variant{}, int32(5000))
 	if call.Err != nil {
-		panic(call.Err)
+		log.Errorf("unable to send dbus message: %v", call.Err)
 	}
 }
