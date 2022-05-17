@@ -10,7 +10,15 @@ Dropbox has a few gui bugs in i3. I don't know if they are related to i3 or drop
 
 Checks whether `dropbox` process is running.
 
-### Usage
+### logs
+
+Logs are stored in `~/.local/go-utils/dropbox-keepalive/logs`.
+
+# libs
+
+## logger
+
+The logger uses
 
 # Installation and Usage
 
