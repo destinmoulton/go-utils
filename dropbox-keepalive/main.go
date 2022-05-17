@@ -47,7 +47,7 @@ func main() {
 
 	if !isIconInSystray && isRunning {
 		// Reload i3
-		log.Info("restart i3. dropbox icon not in systray.")
+		log.Info("restarted i3: dropbox icon not in systray.")
 		cmd := exec.Command("/usr/bin/i3-msg", "restart")
 		cmd.Run()
 		lib.DBus.Msg("Dropbox Alive?", "i3 restarted for the Dropbox icon.")
