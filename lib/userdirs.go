@@ -1,9 +1,10 @@
 package lib
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type DirData struct {
@@ -49,11 +50,10 @@ func (d *DirData) Logs() string {
 }
 
 func (d *DirData) makeUserDirs() {
-	for dir := range d.dirs {
+	for k, dir := range d.dirs {
 		err := os.MkdirAll(dir, 0777)
 		if err != nil {
-			fmt.Printf("error creating userdir %s %v", dir, err)
-			os.Exit(1)
+			log.Panic("error creating userdir %s %s %v", k, dir, err)
 		}
 	}
 }

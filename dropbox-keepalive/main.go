@@ -5,11 +5,13 @@ import (
 	"go-utils/lib"
 	"os"
 	"os/exec"
+
+	log "github.com/sirupsen/logrus"
 )
 
 func main() {
 	lib.UserDirs.Init("dropbox-keepalive")
-	fmt.Println(lib.UserDirs.Config())
+	lib.Logger.SetupLogger(lib.UserDirs.Logs())
 	// Check if the process is running
 	p := "dropbox"
 	isRunning, err := lib.Processes.IsRunning(p)
@@ -20,6 +22,7 @@ func main() {
 	}
 
 	if !isRunning {
+		log.Info("dropbox not in process list: starting dropbox")
 		lib.DBus.Msg("Dropbox Alive?", "Dropbox is not in process list. Starting...")
 		cmd := exec.Command("/usr/bin/dropbox")
 		cmd.Run()
@@ -29,13 +32,11 @@ func main() {
 	// Get the system tray and save as png
 	img, err := lib.ImageTools.SystrayShot(120)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		log.Panicf("unable to make systray snapshot: %v", err)
 	}
 	filename, err := lib.ImageTools.SaveAsTempPNG(img)
 	if err != nil {
-		fmt.Printf("unable to save temp png: %v\n", err)
-		os.Exit(1)
+		log.Panicf("unable to save temp png: %v\n", err)
 	}
 	small := "dropbox_icon.png"
 	isIconInSystray := lib.ImageTools.IsImageWithin(small, filename)
@@ -46,6 +47,7 @@ func main() {
 
 	if !isIconInSystray && isRunning {
 		// Reload i3
+		log.Info("restart i3. dropbox icon not in systray.")
 		cmd := exec.Command("/usr/bin/i3-msg", "restart")
 		cmd.Run()
 		lib.DBus.Msg("Dropbox Alive?", "i3 restarted for the Dropbox icon.")
