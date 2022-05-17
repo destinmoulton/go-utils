@@ -27,8 +27,7 @@ func (d *DirData) Init(appname string) {
 		d.dirs["cache"] = filepath.Join(os.Getenv("HOME"), ".cache", module, appname)
 	}
 
-	d.dirs["local"] = filepath.Join(os.Getenv("HOME"), ".local", module, appname)
-	d.dirs["logs"] = filepath.Join(d.dirs["local"], "logs")
+	d.dirs["logs"] = filepath.Join(os.Getenv("HOME"), "logs", module, appname)
 
 	d.makeUserDirs()
 }
@@ -39,10 +38,6 @@ func (d *DirData) Config() string {
 
 func (d *DirData) Cache() string {
 	return d.dirs["cache"]
-}
-
-func (d *DirData) Local() string {
-	return d.dirs["local"]
 }
 
 func (d *DirData) Logs() string {
