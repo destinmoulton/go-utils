@@ -23,7 +23,7 @@ func main() {
 
 	if !isRunning {
 		log.Info("dropbox not in process list: starting dropbox")
-		lib.DBus.Msg("Dropbox Alive?", "Dropbox is not in process list. Starting...")
+		lib.DBus.Msg("Dropbox Keepalive", "Dropbox is not in process list. Starting...")
 		cmd := exec.Command("/usr/bin/dropbox")
 		cmd.Run()
 		os.Exit(0)
@@ -50,6 +50,6 @@ func main() {
 		log.Info("restarted i3: dropbox icon not in systray.")
 		cmd := exec.Command("/usr/bin/i3-msg", "restart")
 		cmd.Run()
-		lib.DBus.Msg("Dropbox Alive?", "i3 restarted for the Dropbox icon.")
+		lib.DBus.Msg("Dropbox Keepalive", "i3 restarted for the Dropbox systray icon")
 	}
 }
