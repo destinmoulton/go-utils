@@ -1,6 +1,16 @@
-# procalive
+# go-utils
 
-Check whether a Linux process is running, and if not, start it.
+A set of utilities written in Go.
+
+A shared lib package allows the utilities to send messages via dbus, take a screenshot, perform basic image comparison, and many other useful things.
+
+## Dropbox Keepalive (dropbox-keepalive)
+
+Dropbox has a few gui bugs in i3. I don't know if they are related to i3 or dropbox or the systray, but the Dropbox systray icon sometimes disappears after resuming from sleep/hibernation. Sometimes the systray icon loads in the upper left of the screen.
+
+Checks whether `dropbox` process is running.
+
+### Usage
 
 # Installation and Usage
 
