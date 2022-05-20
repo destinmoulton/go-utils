@@ -98,7 +98,7 @@ func generateBackupSection(b *BackupObj, logpath string) ([]string, string) {
 	lines = append(lines, comment)
 
 	// Pipe the rsync output into end of the log file
-	command := fmt.Sprintf("rsync -avr --log-file=%s %s %s %s", logpath, exclude, b.Src, b.Dest)
+	command := fmt.Sprintf("rsync -avr %s %s %s >> %s", exclude, b.Src, b.Dest, logpath)
 	return append(lines, command), command
 }
 
