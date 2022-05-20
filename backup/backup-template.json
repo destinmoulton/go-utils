@@ -1,0 +1,10 @@
+[
+    {
+        "name": "dotfiles",
+        "group": "dropbox",
+        "src": "",
+        "dest": "",
+        "exclusions": [".cache", "node_modules", ".git", "logs"],
+        "is_ssh": false
+    }
+]
