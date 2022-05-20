@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"go-utils/lib"
 	"io/ioutil"
@@ -24,17 +25,29 @@ type BackupObj struct {
 	Exclusions []string
 	IsSSH      bool `json:"is_ssh"`
 }
+type BackupArray []BackupObj
+type BackupMap map[string]BackupObj
 
 func main() {
+	optDelete := false
+	optJobs := "all"
+	flag.BoolVar(&optDelete, "d", false, "run rsync with --delete-excluded")
+	flag.StringVar(&optJobs, "j", "all", "run the selected backup job(s) from the json file (comma separate multiple)")
+	flag.Parse()
+
 	lib.UserDirs.Init("backup")
 	lib.Logger.SetupLogger(lib.UserDirs.Logs())
 
 	cpath := filepath.Join(lib.UserDirs.Config(), "backup.json")
-	var backupArray []BackupObj
+	var backupArray BackupArray
 	lib.Config.ParseJSONToBytes(cpath, &backupArray)
 
+	fmt.Println(optJobs)
+	backupsToRun := parseJobsOption(optJobs, backupArray)
+	fmt.Println(backupsToRun)
+	os.Exit(1)
 	slines := []string{}
-	for _, backup := range backupArray {
+	for _, backup := range backupsToRun {
 		// Get (or make) the rsync log dir
 		dir := getLogDir(&backup)
 		logpath := getFullLogPath(&backup)
@@ -60,7 +73,27 @@ func main() {
 		log.Fatalf("error when starting backup: %v", err)
 	}
 }
-
+func parseJobsOption(jobs string, orig BackupArray) BackupMap {
+	backupsMap := make(BackupMap)
+	for _, backup := range orig {
+		backupsMap[backup.Name] = backup
+	}
+	backupsToRun := make(BackupMap)
+	if jobs == "all" {
+		backupsToRun = backupsMap
+	} else {
+		poss := strings.Split(jobs, ",")
+		for _, s := range poss {
+			b, ok := backupsMap[s]
+			if !ok {
+				log.Warnf("the backup job `%s` is not in the json config file", s)
+			} else {
+				backupsToRun[s] = b
+			}
+		}
+	}
+	return backupsToRun
+}
 func writeShellScript(lines []string, filename string) error {
 	shlines := []string{
 		"#!/bin/sh", // Run it as a standard shell script
