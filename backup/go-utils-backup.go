@@ -27,12 +27,15 @@ type BackupObj struct {
 }
 type BackupArray []BackupObj
 type BackupMap map[string]BackupObj
+type Opts struct {
+	delete bool
+	jobs   string
+}
 
 func main() {
-	optDelete := false
-	optJobs := "all"
-	flag.BoolVar(&optDelete, "d", false, "run rsync with --delete-excluded")
-	flag.StringVar(&optJobs, "j", "all", "run the selected backup job(s) from the json file (comma separate multiple)")
+	opts := Opts{delete: false, jobs: "all"}
+	flag.BoolVar(&opts.delete, "d", false, "run rsync with --delete-excluded")
+	flag.StringVar(&opts.jobs, "j", "all", "run the selected backup job(s) from the json file (comma separate multiple)")
 	flag.Parse()
 
 	lib.UserDirs.Init("backup")
@@ -42,16 +45,13 @@ func main() {
 	var backupArray BackupArray
 	lib.Config.ParseJSONToBytes(cpath, &backupArray)
 
-	fmt.Println(optJobs)
-	backupsToRun := parseJobsOption(optJobs, backupArray)
-	fmt.Println(backupsToRun)
-	os.Exit(1)
+	backupsToRun := parseJobsOption(opts, backupArray)
 	slines := []string{}
 	for _, backup := range backupsToRun {
 		// Get (or make) the rsync log dir
 		dir := getLogDir(&backup)
 		logpath := getFullLogPath(&backup)
-		blines, command := generateBackupSection(&backup, logpath)
+		blines, command := generateBackupSection(&backup, logpath, &opts)
 		slines = append(slines, blines...)
 		createLogFile(&backup, logpath, fmt.Sprintf("%s\n\n", command))
 		removeOldLogFiles(dir)
@@ -73,16 +73,16 @@ func main() {
 		log.Fatalf("error when starting backup: %v", err)
 	}
 }
-func parseJobsOption(jobs string, orig BackupArray) BackupMap {
+func parseJobsOption(opts Opts, orig BackupArray) BackupMap {
 	backupsMap := make(BackupMap)
 	for _, backup := range orig {
 		backupsMap[backup.Name] = backup
 	}
 	backupsToRun := make(BackupMap)
-	if jobs == "all" {
+	if opts.jobs == "all" {
 		backupsToRun = backupsMap
 	} else {
-		poss := strings.Split(jobs, ",")
+		poss := strings.Split(opts.jobs, ",")
 		for _, s := range poss {
 			b, ok := backupsMap[s]
 			if !ok {
@@ -108,7 +108,7 @@ func writeShellScript(lines []string, filename string) error {
 }
 
 // Generate the lines of a backup
-func generateBackupSection(b *BackupObj, logpath string) ([]string, string) {
+func generateBackupSection(b *BackupObj, logpath string, opts *Opts) ([]string, string) {
 
 	lines := []string{
 		"",
@@ -126,12 +126,17 @@ func generateBackupSection(b *BackupObj, logpath string) ([]string, string) {
 		exclude = fmt.Sprintf("--exclude={%s}", strings.Join(excls, ","))
 	}
 
+	delete := ""
+	if opts.delete {
+		delete = "--delete-excluded"
+	}
+
 	// Add a comment
 	comment := fmt.Sprintf("# Backup %s", b.Name)
 	lines = append(lines, comment)
 
 	// Pipe the rsync output into end of the log file
-	command := fmt.Sprintf("rsync -avr %s %s %s >> %s", exclude, b.Src, b.Dest, logpath)
+	command := fmt.Sprintf("rsync -avr %s %s %s %s >> %s", exclude, delete, b.Src, b.Dest, logpath)
 	return append(lines, command), command
 }
 
