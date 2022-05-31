@@ -23,7 +23,7 @@ type BackupObj struct {
 	Src        string
 	Dest       string
 	Exclusions []string
-	SSHPem     string `json:"ssh_pem"`
+	SSHPemFile string `json:"ssh_pem_file"`
 }
 type BackupArray []BackupObj
 type BackupMap map[string]BackupObj
@@ -133,8 +133,8 @@ func generateBackupSection(b *BackupObj, logpath string, opts *Opts) ([]string, 
 	}
 
 	ssh := ""
-	if b.SSHPem != "" {
-		ssh = fmt.Sprintf("-e 'ssh -i %s'", b.SSHPem)
+	if b.SSHPemFile != "" {
+		ssh = fmt.Sprintf("-e 'ssh -i %s'", b.SSHPemFile)
 	}
 
 	// Add a comment
