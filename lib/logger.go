@@ -13,11 +13,11 @@ type LoggerData struct{}
 
 var Logger LoggerData
 
-func (l *LoggerData) SetupLogger(logpath string) {
+func (l *LoggerData) SetupLogger(logpath string, util string) {
 
 	lumberjackLogger := &lumberjack.Logger{
 		// Log file abbsolute path, os agnostic
-		Filename:   filepath.ToSlash(filepath.Join(logpath, "logs")),
+		Filename:   filepath.ToSlash(filepath.Join(logpath, util+".log")),
 		MaxSize:    5, // MB
 		MaxBackups: 10,
 		MaxAge:     30,   // days
