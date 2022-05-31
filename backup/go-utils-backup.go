@@ -69,10 +69,11 @@ func main() {
 	cmd := exec.Command("/bin/bash", shfile)
 	log.Infof("running backup `%s`: %s", shfile, cmd)
 	out, err := cmd.CombinedOutput() // NOTE: Run as Start to keep script running in case of this crashing
-	if err != nil {
-		log.Fatalf("error running backup: %s: %v", string(out), err)
-	}
 	log.Infof("backup completed with output: %s", string(out))
+	if err != nil {
+		// Don't Fatal; capture the errors in the log
+		log.Infof("errors: %v", err)
+	}
 }
 func parseJobsOption(opts Opts, orig BackupArray) BackupMap {
 	backupsMap := make(BackupMap)
