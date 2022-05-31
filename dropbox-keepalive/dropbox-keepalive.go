@@ -11,7 +11,7 @@ import (
 
 func main() {
 	lib.UserDirs.Init("dropbox-keepalive")
-	lib.Logger.SetupLogger(lib.UserDirs.Logs())
+	lib.Logger.SetupLogger(lib.UserDirs.Logs(), "dropbox-keepalive")
 	// Check if the process is running
 	p := "dropbox"
 	isRunning, err := lib.Processes.IsRunning(p)
