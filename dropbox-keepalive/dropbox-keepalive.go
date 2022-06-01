@@ -14,8 +14,7 @@ func main() {
 	lib.Logger.SetupLogger(lib.UserDirs.Logs(), "dropbox-keepalive")
 	// Check if the process is running
 	p := "dropbox"
-	isRunning, err := lib.Processes.IsRunning(p)
-
+	isRunning, err := lib.Processes.IsRunning(p, os.Getpid())
 	if err != nil {
 		log.Fatalf("error scanning processes: %v", err)
 	}

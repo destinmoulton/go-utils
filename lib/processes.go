@@ -35,13 +35,17 @@ func (p *Process) Cmdline() string {
 var Processes Procs
 
 // Find a process by string in either the binary (preferred) or cmdline
-func (p *Procs) Find(needle string) (*Process, error) {
+func (p *Procs) Find(needle string, ignorepid int) (*Process, error) {
 	processes, err := p.getAllProcesses()
 	if err != nil {
 		return nil, err
 	}
 
 	for _, proc := range processes {
+		if proc.pid == ignorepid {
+			// don't pay attention to this pid
+			continue
+		}
 		if strings.Contains(proc.binary, needle) {
 			return proc, nil
 		}
@@ -53,8 +57,8 @@ func (p *Procs) Find(needle string) (*Process, error) {
 }
 
 // Determine if a process is running
-func (p *Procs) IsRunning(name string) (bool, error) {
-	proc, err := p.Find(name)
+func (p *Procs) IsRunning(name string, ignorepid int) (bool, error) {
+	proc, err := p.Find(name, ignorepid)
 	if err != nil {
 		return false, err
 	}
