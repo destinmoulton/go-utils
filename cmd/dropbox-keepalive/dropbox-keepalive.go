@@ -38,7 +38,10 @@ func main() {
 	}
 	small := filepath.Join(lib.UserDirs.Config(), "dropbox_icon.png")
 	isIconInSystray := lib.ImageTools.IsImageWithin(small, filename)
-	os.Remove(filename)
+	err = os.Remove(filename)
+	if err != nil {
+		log.Fatalf("failed to remove the temporary screenshot: %v", err)
+	}
 	//fmt.Printf("Is %s within %s? %v\n", small, filename, isIconInSystray)
 
 	//fmt.Printf("Is %s running? %v\n", p, isRunning)
