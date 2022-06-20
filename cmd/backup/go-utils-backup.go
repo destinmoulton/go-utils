@@ -117,15 +117,15 @@ func generateBackupSection(b *BackupObj, logpath string, opts *Opts) ([]string, 
 	}
 	// Add args
 	hasExcl := false
-	excls := []string{}
+	var excls []string
 	exclude := ""
 	for _, ex := range b.Exclusions {
 		hasExcl = true
 		// Wrap them
-		excls = append(excls, fmt.Sprintf("'%s'", ex))
+		excls = append(excls, fmt.Sprintf("--exclude='%s'", ex))
 	}
 	if hasExcl {
-		exclude = fmt.Sprintf("--exclude={%s}", strings.Join(excls, ","))
+		exclude = strings.Join(excls, " ")
 	}
 
 	delete := ""
