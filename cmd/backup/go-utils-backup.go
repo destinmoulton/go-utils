@@ -128,9 +128,9 @@ func generateBackupSection(b *BackupObj, logpath string, opts *Opts) ([]string, 
 		exclude = strings.Join(excls, " ")
 	}
 
-	delete := ""
+	delarg := ""
 	if opts.delete {
-		delete = "--delete-excluded"
+		delarg = "--delete-excluded"
 	}
 
 	ssh := ""
@@ -143,7 +143,7 @@ func generateBackupSection(b *BackupObj, logpath string, opts *Opts) ([]string, 
 	lines = append(lines, comment)
 
 	// Pipe the rsync output into end of the log file
-	command := fmt.Sprintf("rsync -avr %s %s %s %s %s >> %s", exclude, delete, ssh, b.Src, b.Dest, logpath)
+	command := fmt.Sprintf("rsync -avr %s %s %s %s %s >> %s", exclude, delarg, ssh, b.Src, b.Dest, logpath)
 	return append(lines, command), command
 }
 
